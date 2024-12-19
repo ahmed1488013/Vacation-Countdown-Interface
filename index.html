@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripTimer - Trip Input and Countdown</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #FFE4B5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #4682B4;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .trip-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    input, button {
+      padding: 12px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 100%;
+    }
+
+    input {
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #FF6347;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #FF4500;
+    }
+
+    .countdown {
+      margin-top: 30px;
+      display: none;
+      text-align: center;
+    }
+
+    .countdown p {
+      font-size: 22px;
+      font-weight: bold;
+      color: #333333;
+    }
+
+    .countdown span {
+      font-size: 26px;
+      font-weight: bold;
+      color: #4682B4;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      .trip-inputs input,
+      .trip-inputs button {
+        font-size: 16px;
+      }
+      .countdown span {
+        font-size: 22px;
+      }
+      .countdown p {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Enter Your Trip Details</h1>
+
+    <div class="trip-inputs">
+      <!-- Trip input page -->
+      <input type="text" id="destination" placeholder="Enter Destination" />
+      <input type="date" id="departure-date" />
+      <button id="set-trip-btn">Add New Trip</button>
+    </div>
+
+    <!-- Countdown display -->
+    <div class="countdown">
+      <p>Time remaining for your trip to <span id="destination-name">...</span>:</p>
+      <p><span id="countdown-timer">0d 0h 0m</span></p>
+    </div>
+  </div>
+
+  <script>
+    // Listening for the "Add New Trip" button click
+    document.getElementById('set-trip-btn').addEventListener('click', function() {
+      const destination = document.getElementById('destination').value;
+      const departureDate = document.getElementById('departure-date').value;
+
+      // Check if all fields are filled
+      if (!destination || !departureDate) {
+        alert('Please enter both destination and departure date.');
+        return;
+      }
+
+      // Redirect to the countdown page with parameters
+      window.location.href = '?destination=' + destination + '&departureDate=' + departureDate;
+    });
+
+    // Update countdown on page load
+    const urlParams = new URLSearchParams(window.location.search);
+    const destination = urlParams.get('destination');
+    const departureDate = new Date(urlParams.get('departureDate'));
+
+    if (destination && departureDate) {
+      // Display the destination name
+      document.getElementById('destination-name').textContent = destination;
+
+      // Show the countdown section
+      document.querySelector('.countdown').style.display = 'block';
+
+      // Countdown update function
+      function updateCountdown() {
+        const now = new Date();
+        const timeDiff = departureDate - now;
+
+        if (timeDiff <= 0) {
+          document.getElementById('countdown-timer').textContent = 'Your trip has arrived!';
+          return;
+        }
+
+        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+        document.getElementById('countdown-timer').textContent = `${days}d ${hours}h ${minutes}m`;
+      }
+
+      setInterval(updateCountdown, 60000); // Update countdown every minute
+      updateCountdown(); // Immediately update countdown on load
+    }
+  </script>
+
+</body>
+</html>
